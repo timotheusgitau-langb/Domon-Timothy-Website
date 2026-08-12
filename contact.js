@@ -41,12 +41,19 @@ if (contactForm) {
         body: JSON.stringify(payload),
       });
 
+      // Try to parse JSON from server if any
+      const result = await response.json().catch(() => null);
+
       if (response.ok) {
         contactForm.reset();
         if (feedback) {
           feedback.classList.remove('error');
           feedback.classList.add('success');
-          feedback.textContent = 'Your message was sent to the admin. Thank you!';
+
+          // Prefer server-provided message when available
+          const serverMessage = result && (result.message || result.msg || (result.ok === false && result.error)) ? (result.message || result.msg || result.error) : null;
+          feedback.textContent = serverMessage || 'Your message was sent to the admin. Thank you!';
+
           // ensure focus for keyboard/screen-reader users
           feedback.setAttribute('tabindex', '-1');
           try { feedback.focus(); } catch (e) { /* no-op */ }
@@ -59,11 +66,14 @@ if (contactForm) {
           }, 6000);
         }
       } else {
-        const result = await response.json().catch(() => ({}));
         if (feedback) {
           feedback.classList.remove('success');
           feedback.classList.add('error');
-          feedback.textContent = result.error || 'Unable to send message right now.';
+
+          // Prefer server-provided message when available
+          const serverMessage = result && (result.message || result.error || result.msg) ? (result.message || result.error || result.msg) : null;
+          feedback.textContent = serverMessage || 'Unable to send message right now.';
+
           feedback.setAttribute('tabindex', '-1');
           try { feedback.focus(); } catch (e) { /* no-op */ }
           // keep error visible but remove after a bit longer
@@ -79,6 +89,8 @@ if (contactForm) {
         clearTimeout(_contactHideTimer);
         feedback.classList.remove('success');
         feedback.classList.add('error');
+
+        // If network error, there's no server message; show generic
         feedback.textContent = 'Network error. Please try again later.';
         feedback.setAttribute('tabindex', '-1');
         try { feedback.focus(); } catch (e) { /* no-op */ }
