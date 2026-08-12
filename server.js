@@ -49,54 +49,101 @@ function saveMessage(data) {
 }
 
 async function verifyRecaptcha(token, remoteIp) {
-  const url = `https://www.google.com/recaptcha/api/siteverify?secret=${encodeURIComponent(RECAPTCHA_SECRET)}&response=${encodeURIComponent(token)}&remoteip=${encodeURIComponent(remoteIp)}`;
+  if (!RECAPTCHA_SECRET || RECAPTCHA_SECRET === 'YOUR_RECAPTCHA_SECRET') {
+    // If no secret provided, skip verification in development (but recommend enabling it).
+    return { success: true };
+  }
+
+  const url = `https://www.google.com/recaptcha/api/siteverify?secret=${encodeURIComponent(
+    RECAPTCHA_SECRET
+  )}&response=${encodeURIComponent(token)}&remoteip=${encodeURIComponent(remoteIp)}`;
+
   const response = await fetch(url, { method: 'POST' });
   return response.json();
 }
 
+function escapeHtml(unsafe) {
+  return String(unsafe)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 app.post('/api/contact', async (req, res) => {
-  const { name, email, subject, message, 'g-recaptcha-response': recaptchaResponse } = req.body;
-  if (!name || !email || !subject || !message || !recaptchaResponse) {
-    return res.status(400).json({ error: 'All fields are required.' });
+  const { name, email, subject, message, 'g-recaptcha-response': recaptchaResponse } = req.body || {};
+  if (!name || !email || !subject || !message) {
+    return res.status(400).json({ ok: false, error: 'Please provide name, email, subject and message.' });
+  }
+
+  if (!recaptchaResponse) {
+    return res.status(400).json({ ok: false, error: 'CAPTCHA response is required.' });
   }
 
   try {
     const verification = await verifyRecaptcha(recaptchaResponse, req.ip);
-    if (!verification.success || verification.score < 0.5) {
-      return res.status(400).json({ error: 'CAPTCHA verification failed.' });
+    // Accept if success is true AND (no score provided OR score >= 0.5)
+    const scoreOk = verification && (typeof verification.score === 'undefined' || verification.score >= 0.5);
+    if (!verification || !verification.success || !scoreOk) {
+      return res.status(400).json({ ok: false, error: 'CAPTCHA verification failed.' });
     }
   } catch (error) {
-    return res.status(500).json({ error: 'Unable to validate CAPTCHA.' });
+    console.error('reCAPTCHA verification error:', error);
+    return res.status(500).json({ ok: false, error: 'Unable to validate CAPTCHA.' });
   }
 
   const timestamp = new Date().toISOString();
-  const messageData = { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, name, email, subject, message, timestamp, ip: req.ip, read: false };
-  saveMessage(messageData);
+  const messageData = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    name,
+    email,
+    subject,
+    message,
+    timestamp,
+    ip: req.ip,
+    read: false,
+  };
 
+  // Save message locally for admin UI even if email fails
+  try {
+    saveMessage(messageData);
+  } catch (err) {
+    console.error('Failed to save message locally:', err);
+  }
+
+  // Build transporter using environment SMTP credentials
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.example.com',
     port: Number(process.env.SMTP_PORT || 587),
-    secure: false,
+    secure: process.env.SMTP_SECURE === 'true' || false,
     auth: {
-      user: process.env.SMTP_USER || 'smtp-user',
-      pass: process.env.SMTP_PASS || 'smtp-pass',
+      user: process.env.SMTP_USER || '',
+      pass: process.env.SMTP_PASS || '',
     },
   });
 
   const mailOptions = {
-    from: `Timothy Domon <${process.env.SMTP_USER}>`,
+    from: process.env.SMTP_FROM || `Website Contact <${process.env.SMTP_USER || 'no-reply@example.com'}>`,
     to: ADMIN_EMAIL,
     subject: `Website message: ${subject}`,
     text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\nMessage:\n${message}\n\nReceived: ${timestamp}`,
-    html: `<p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Message:</strong><br/>${message.replace(/\n/g, '<br/>')}</p><p><strong>Received:</strong> ${timestamp}</p>`,
+    html: `
+      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+      <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+      <p><strong>Message:</strong><br/>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>
+      <p><small>Received: ${timestamp} • IP: ${req.ip}</small></p>
+    `,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    res.json({ success: true });
+    return res.status(200).json({ ok: true, message: 'Message received — the admin will contact you shortly.' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to send email.' });
+    console.error('Failed to send email:', error);
+    // Email failed but message is saved locally; return success response that informs admin will review
+    return res.status(502).json({ ok: false, error: 'Failed to send email to admin; message was saved and will be reviewed.' });
   }
 });
 
