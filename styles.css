@@ -1,3 +1,4 @@
+/* (full styles.css content with added feedback styles) */
 :root {
   color-scheme: dark;
   color: #e8f0ff;
@@ -534,6 +535,35 @@ h3 {
 .form-note {
   margin-top: 1rem;
   color: #94a3b8;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+/* Feedback states for contact form */
+#contact-feedback.success {
+  color: #10b981; /* emerald */
+  background: rgba(16, 185, 129, 0.06);
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+#contact-feedback.error {
+  color: #f43f5e; /* rose-500 */
+  background: rgba(244, 63, 94, 0.06);
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+/* Small helper for visually hiding but keeping accessible */
+.hidden-visually {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
 }
 
 .site-footer {
