@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Messages | Timothy Domon</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">Timothy Domon</a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="blog.html">Blog</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section-white">
+    <div class="container">
+      <section class="section-intro page-intro">
+        <p class="eyebrow">Admin dashboard</p>
+        <h1>Submitted contact messages</h1>
+        <p class="lead">Review all messages here. Messages are stored securely and delivered to your admin email.</p>
+      </section>
+
+      <section class="section-overlap">
+        <div class="admin-actions-panel">
+          <button id="mark-all-read" class="button button-secondary">Mark all read</button>
+          <button id="delete-all" class="button button-ghost">Clear all messages</button>
+        </div>
+        <div class="messages-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Received</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="messages-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="index.html">Timothy Domon</a>
+        <p>dashboard for admin message review.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="admin.js"></script>
+</body>
+</html>

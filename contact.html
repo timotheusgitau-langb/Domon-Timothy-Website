@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Contact Timothy Domon for neon web design, digital tools, and custom technical projects." />
+  <meta name="keywords" content="Timothy Domon contact, neon design inquiry, project consultation" />
+  <meta name="robots" content="index, follow" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <title>Contact | Timothy Domon</title>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">Timothy Domon</a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="index.html#projects">Projects</a>
+        <a href="blog.html">Blog</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="section-white section-intro page-intro">
+      <div class="container">
+        <p class="eyebrow">Let's work together</p>
+        <h1>Ready to improve your digital experience?</h1>
+        <p class="lead">Tell us about your project, and we’ll respond quickly with a custom recommendation for design, strategy, and execution.</p>
+      </div>
+    </section>
+
+    <section class="container section-overlap contact-grid">
+      <div class="contact-details">
+        <h2>Get in touch</h2>
+        <p>Use the secure form to send your message directly to my official admin inbox.</p>
+        <ul>
+          <li><strong>Email:</strong> <a href="mailto:contact@timothydomon.com">contact@timothydomon.com</a></li>
+        </ul>
+      </div>
+      <form id="contact-form" class="contact-form" method="post">
+        <input type="hidden" name="bot-field" />
+
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Your name" required autocomplete="name" />
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="your@email.com" required autocomplete="email" />
+
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" placeholder="Project topic or question" required />
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" placeholder="Tell me about your goals, timeline, and any technology preferences." required></textarea>
+
+        <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+
+        <button type="submit" class="button button-primary">Send message</button>
+        <p id="contact-feedback" class="form-note"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="index.html">Timothy Domon</a>
+        <p>Domon Studio focused on websites, software projects, and futuristic brand experiences.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="services.html">Services</a>
+        <a href="blog.html">Blog</a>
+      </nav>
+    </div>
+    <p class="footer-note">© 2026 Timothy Domon. Built for the modern web.</p>
+  </footer>
+
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="contact.js"></script>
+  <script src="scripts.js"></script>
+</body>
+</html>
