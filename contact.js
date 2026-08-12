@@ -35,7 +35,7 @@ if (contactForm) {
       if (response.ok) {
         contactForm.reset();
         if (feedback) {
-          feedback.textContent = 'Message sent successfully. Thank you!';
+          feedback.textContent = 'Your message was sent to the admin. Thank you!';
         }
       } else {
         const result = await response.json();
