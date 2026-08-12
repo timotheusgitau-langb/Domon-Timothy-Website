@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'contact@timothydomon.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'timotheusgitau@gmail.com';
 const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET || 'YOUR_RECAPTCHA_SECRET';
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'password';
