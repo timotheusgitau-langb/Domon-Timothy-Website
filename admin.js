@@ -27,6 +27,15 @@ async function markAllRead() {
   }
 }
 
+async function resendMessage(id) {
+  const response = await fetch(`/api/messages/${id}/resend`, { method: 'POST' });
+  if (!response.ok) {
+    const json = await response.json().catch(() => null);
+    throw new Error((json && json.error) || 'Unable to resend message.');
+  }
+  return response.json();
+}
+
 function createActionButton(label, className, onClick) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -71,6 +80,17 @@ async function loadMessages() {
     messageCell.textContent = message.message;
 
     const actionsCell = document.createElement('td');
+    const resendButton = createActionButton('Resend', 'button-primary', async () => {
+      if (!confirm('Resend this message to the admin email?')) return;
+      try {
+        const result = await resendMessage(message.id);
+        alert(result.message || 'Resend successful.');
+        await loadMessages();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
     const deleteButton = createActionButton('Delete', 'button-ghost', async () => {
       if (!confirm('Delete this message permanently?')) return;
       try {
@@ -80,6 +100,8 @@ async function loadMessages() {
         alert(error.message);
       }
     });
+
+    actionsCell.appendChild(resendButton);
     actionsCell.appendChild(deleteButton);
 
     row.append(statusCell, receivedCell, nameCell, emailCell, subjectCell, messageCell, actionsCell);
